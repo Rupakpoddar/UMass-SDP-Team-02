@@ -52,9 +52,9 @@ void loop()
 {
   myMux.setPort(port);
   byte currentPortNumber = myMux.getPort();
+  Serial.println();
   Serial.print("CurrentPort: ");
   Serial.println(currentPortNumber);
-  Serial.println();
 
   byte nDevices = 0;
   for (byte address = 1; address < 127; address++)
