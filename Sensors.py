@@ -18,7 +18,7 @@ mySensor.pressure_oversample = 1	# 0 to 16 are valid. 0 disables pressure sensin
 mySensor.humidity_oversample = 1	# 0 to 16 are valid. 0 disables humidity sensing. See table 19.
 mySensor.mode = mySensor.MODE_NORMAL # MODE_SLEEP, MODE_FORCED, MODE_NORMAL is valid. See 3.3
 
-fig, axs = plt.subplots(2, 2)
+fig, axs = plt.subplots(2, 2, sharex= True)
 #plt.rcParams['figure.figsize'] = [15,11]
 
 if mySensor.connected == False:
@@ -27,58 +27,45 @@ if mySensor.connected == False:
 
 def getDiag(node):
     global pressure, humidity, altitude, temp, pm, times, visited, x_axis
-    print(node, visited)
-    if node not in visited:
-        print("here")
-        visited.append(node)
+    tem = str(node[0])+","+str(node[1])
+    #print(tem, x_axis)
+    if tem not in x_axis:
+        #if node not in visited:
+        #print("here")
+        #visited.append(node)
         pressure.append(mySensor.pressure/100)
         humidity.append(mySensor.humidity)
-        altitude.append(mySensor.altitude_feet)
+        altitude.append(mySensor.altitude_feet/(-1000))
         temp.append(mySensor.temperature_fahrenheit)
         pm.append(getAQI(mySensor.pressure))
         times.append(time.time() - t1)
         #print(len(times), len(pressure))
         #tem = ""
-        
-        tem = str(node[0])+","+str(node[1])
+
         x_axis.append(tem)
-    print(x_axis)
+    #print(x_axis)
 
 def graph():
     global pressure, humidity, altitude, temp, pm, times, x_axis
-    '''
-    pressure = pressure[-20:]
-    humidity = humidity[-20:]
-    temp = temp[-20:]
-    #altitude = altitude[-20:]
-    pm = pm[-20:]
     
-    print("graphing")
-    if not x_axis:
-        x_axis = times
-    x_axis = x_axis[-20:]
-    
-    '''
-    
-    print(x_axis)
+    #print(x_axis)
     axs[0, 0].plot(x_axis, altitude)
-    #axs[0, 0].set_title('Altitude')
-    axs[0, 0].set(ylabel = 'Altitude (ft)')
+    axs[0, 0].set(ylabel = 'Altitude (cm)')
     
     axs[0, 1].plot(x_axis, humidity, 'tab:orange')
-    #axs[0, 1].set_title('Humidity')
     axs[0, 1].set(ylabel = 'Humidity (%RH)')
     
     axs[1, 0].plot(x_axis, pm, 'tab:green')
-    #axs[1, 0].set_title('PM2.5')
-    axs[1, 0].set(ylabel = 'AQI (PPM)')
+    axs[1, 0].set(xlabel = 'Nodes (x,y)', ylabel = 'AQI (PPM)')
+    axs[1, 0].set_xticklabels(x_axis, rotation = 45)
     
     axs[1, 1].plot(x_axis, temp, 'tab:red')
-    #axs[1, 1].set_title('Temperature (F)')
-    axs[1, 1].set(ylabel = 'Temp (F)')
+    axs[1, 1].set(xlabel = 'Nodes (x,y)', ylabel = 'Temp (F)')
+    axs[1, 1].set_xticklabels(x_axis, rotation = 45)
     
+    plt.xlabel("Node (x,y)")
     fig.suptitle('Diagnostic Data')
-
+    
     plt.show()
 
 def map_range(x, in_min, in_max, out_min, out_max):
